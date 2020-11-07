@@ -9,7 +9,7 @@ import android.widget.Button;
 import ru.geekbrains.githubclient.mvp.presenter.Presenter;
 import ru.geekbrains.githubclient.mvp.view.MainView;
 
-public class MainActivity extends AppCompatActivity implements MainView, View.OnClickListener{
+public class MainActivity extends AppCompatActivity implements MainView, View.OnClickListener {
 
     private Presenter presenter;
 
@@ -32,29 +32,20 @@ public class MainActivity extends AppCompatActivity implements MainView, View.On
         buttonCounter2.setOnClickListener(this);
         buttonCounter3.setOnClickListener(this);
 
+        findViewById(R.id.btn_counter1).setTag(0);
+        findViewById(R.id.btn_counter2).setTag(1);
+        findViewById(R.id.btn_counter3).setTag(2);
+
     }
 
     @Override
     public void setButtonText(int index, String text) {
-        switch (index) {
-            case 0:
-                buttonCounter1.setText(text);
-                break;
-
-            case 1:
-                buttonCounter2.setText(text);
-                break;
-
-            case 2:
-                buttonCounter3.setText(text);
-                break;
-
-
-        }
+        Button button = getWindow().getDecorView().getRootView().findViewWithTag(index);
+        button.setText(text);
     }
 
     @Override
     public void onClick(View view) {
-        presenter.counterClick(view.getId());
+        presenter.counterClick((int) view.getTag());
     }
 }

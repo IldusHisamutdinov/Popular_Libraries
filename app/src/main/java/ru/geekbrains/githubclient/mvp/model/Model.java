@@ -16,16 +16,4 @@ public class Model {
         counters.set(index, value);
     }
 
-    /**
-     * Инкремент счетчика
-     * @param index - индекс счетчика
-     * @return инкрементированное значение
-     */
-    public int next(int index) {
-        Integer nextValue = counters.get(index) + 1;
-
-        counters.set(index, nextValue);
-
-        return nextValue;
-    }
 }
