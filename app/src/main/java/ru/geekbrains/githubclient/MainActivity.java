@@ -1,51 +1,54 @@
 package ru.geekbrains.githubclient;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-
-import ru.geekbrains.githubclient.mvp.presenter.Presenter;
+import androidx.fragment.app.Fragment;
+import moxy.MvpAppCompatActivity;
+import moxy.presenter.InjectPresenter;
+import ru.geekbrains.githubclient.mvp.presenter.MainPresenter;
 import ru.geekbrains.githubclient.mvp.view.MainView;
+import ru.geekbrains.githubclient.ui.BackButtonListener;
+import ru.terrakok.cicerone.Navigator;
+import ru.terrakok.cicerone.NavigatorHolder;
+import ru.terrakok.cicerone.android.support.SupportAppNavigator;
 
-public class MainActivity extends AppCompatActivity implements MainView, View.OnClickListener {
+public class MainActivity extends MvpAppCompatActivity implements MainView {
 
-    private Presenter presenter;
+    @InjectPresenter
+    MainPresenter presenter;
 
-    private Button buttonCounter1;
-    private Button buttonCounter2;
-    private Button buttonCounter3;
+    private NavigatorHolder navigatorHolder = GithubApplication.getApplication().getNavigatorHolder();
+    private Navigator navigator = new SupportAppNavigator(this, getSupportFragmentManager(), R.id.container);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+    }
 
-        presenter = new Presenter(this);
 
-        buttonCounter1 = findViewById(R.id.btn_counter1);
-        buttonCounter2 = findViewById(R.id.btn_counter2);
-        buttonCounter3 = findViewById(R.id.btn_counter3);
-
-        buttonCounter1.setOnClickListener(this);
-        buttonCounter2.setOnClickListener(this);
-        buttonCounter3.setOnClickListener(this);
-
-        findViewById(R.id.btn_counter1).setTag(0);
-        findViewById(R.id.btn_counter2).setTag(1);
-        findViewById(R.id.btn_counter3).setTag(2);
-
+    @Override
+    protected void onResumeFragments() {
+        super.onResumeFragments();
+        navigatorHolder.setNavigator(navigator);
     }
 
     @Override
-    public void setButtonText(int index, String text) {
-        Button button = getWindow().getDecorView().getRootView().findViewWithTag(index);
-        button.setText(text);
+    protected void onPause() {
+        super.onPause();
+
+        navigatorHolder.removeNavigator();
     }
 
     @Override
-    public void onClick(View view) {
-        presenter.counterClick((int) view.getTag());
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+            if (fragment instanceof BackButtonListener && ((BackButtonListener) fragment).backPressed()) {
+                return;
+            }
+        }
+
+        presenter.backClicked();
     }
 }
